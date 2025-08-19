@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from data_settings import DataSettings
+from .data_settings import DataSettings
 
 class ModelSettings(DataSettings):
 

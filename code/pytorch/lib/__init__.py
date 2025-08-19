@@ -1,3 +1,8 @@
-from dataset import SegDataset, AlignCollate
-from model import Model
-from prediction import Prediction
+from .model import Model, Prediction
+
+try:
+    from .dataset import SegDataset, AlignCollate
+except Exception:
+    SegDataset = None
+    AlignCollate = None
+

@@ -51,8 +51,8 @@ class ConcreteDropout(nn.Module):
         # Initialise p_logit
         init_min = np.log(init_min) - np.log(1. - init_min)
         init_max = np.log(init_max) - np.log(1. - init_max)
-        self.p_logit = nn.Parameter(torch.Tensor(1)).cuda()
-        nn.init.uniform(self.p_logit, a=init_min, b=init_max)
+        self.p_logit = nn.Parameter(torch.Tensor(1))
+        nn.init.uniform_(self.p_logit, a=init_min, b=init_max)
 
     def forward(self, x):
         return self.layer(self._concrete_dropout(x))
@@ -76,7 +76,7 @@ class ConcreteDropout(nn.Module):
         self.p = nn.functional.sigmoid(self.p_logit)
 
         # Check if batch size is the same as unif_noise, if not take care
-        unif_noise = Variable(torch.FloatTensor(np.random.uniform(size=tuple(x.size())))).cuda()
+        unif_noise = torch.rand_like(x)
 
         drop_prob = (torch.log(self.p + eps)
                     - torch.log(1 - self.p + eps)

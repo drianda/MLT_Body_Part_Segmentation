@@ -107,7 +107,7 @@ if __name__ == '__main__':
     #dice_loss_2 = DiceLoss(size_average=False)
     #dice_loss_3 = DiceLoss(reduce=False)
 
-    print(dice_loss_1(input, target))
+    print dice_loss_1(input, target)
     #print dice_loss_2(input, target)
     #print dice_loss_3(input, target)
-    print(dice_coefficient(input, target, smooth=1.0))
+    print dice_coefficient(input, target, smooth=1.0)

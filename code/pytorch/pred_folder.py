@@ -39,21 +39,29 @@ prediction = Prediction(ms.IMAGE_SIZE_HEIGHT, ms.IMAGE_SIZE_WIDTH, ms.MEAN, ms.S
 for image_path in image_paths:
     image, pred, var, v = prediction.predict(image_path,n_samples = 10)
     image_name = os.path.splitext(os.path.basename(image_path))[0]
-    
+   
+    # --- visualize prediction ---
     vis_pred_array = np.array(pred)
-    vis_pred_array = vis_pred_array * (255.0/np.max(vis_pred_array))
+    if vis_pred_array.size and vis_pred_array.max() > 0:
+        vis_pred_array = vis_pred_array * (255.0 / vis_pred_array.max())
     vis_pred = Image.fromarray(vis_pred_array.astype('uint8'))
-    vis_pred = ImageOps.colorize(vis_pred,(0,0,255),(255,0,0))
-    
-    vis_var_array = np.array(var)
-    vis_var_array = vis_var_array * (255.0/np.max(vis_var_array))
-    vis_var = Image.fromarray(vis_var_array.astype('uint8'))
-    vis_var = ImageOps.colorize(vis_var,(0,0,255),(255,0,0))
-    
-    #image.save(os.path.join(output_path, image_name + '.png'))
-    #pred.save(os.path.join(output_path, image_name + '-pred.png'))
-    #var.save(os.path.join(output_path, image_name + '-var.png'))
+    vis_pred = ImageOps.colorize(vis_pred, (0,0,255), (255,0,0))
     vis_pred.save(os.path.join(output_path, image_name + '-pred.png'))
-    vis_var.save(os.path.join(output_path, image_name + '-var.png'))
-    savemat(os.path.join(output_path, image_name + '-var.mat'),{'prediction': pred})
-    savemat(os.path.join(output_path, image_name + '-var.mat'),{'variance': v})
+
+    # --- save prediction .mat (key: 'prediction') ---
+    from scipy.io import savemat
+    savemat(os.path.join(output_path, image_name + '-pred.mat'),
+        {'prediction': np.array(pred, dtype=np.uint8)})
+
+    # --- visualize & save variance only if available ---
+    var_np = v if v is not None else var  # accept either name if provided
+    if var_np is not None:
+        vis_var_array = np.array(var_np)
+        if vis_var_array.size and vis_var_array.max() > 0:
+            vis_var_array = vis_var_array * (255.0 / vis_var_array.max())
+        vis_var = Image.fromarray(vis_var_array.astype('uint8'))
+        vis_var = ImageOps.colorize(vis_var, (0,0,255), (255,0,0))
+        vis_var.save(os.path.join(output_path, image_name + '-var.png'))
+        savemat(os.path.join(output_path, image_name + '-var.mat'),
+                {'variance': np.array(var_np)})
+
